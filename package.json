@@ -1,5 +1,5 @@
 {
-    "name": "jsv",
+    "name": "fn-schemavalidator",
     "version": "1.0.0",
     "description": "Javascript JSON Schema Validator",
     "main": "index.js",
