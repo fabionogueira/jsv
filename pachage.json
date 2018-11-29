@@ -2,7 +2,7 @@
     "name": "jsv",
     "version": "1.0.0",
     "description": "Javascript JSON Schema Validator",
-    "main": "src/index.js",
+    "main": "index.js",
     "dependencies": {
     },
     "devDependencies": {
