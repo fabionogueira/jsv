@@ -6,7 +6,7 @@ class Schema {
         this._schema = schema
         this._schemaMap = {}
         
-        defaults = this._schema.$defaults || defaults
+        defaults = this._schema.$defaults || defaults || {}
         delete (this._schema.$defaults)
 
         this.each((path, item) => {
@@ -15,8 +15,10 @@ class Schema {
             }
 
             item.type = typeToString(item.type)
-            if (item.type && item.required==undefined && defaults.required){
-                item.required = true
+            for (let k in defaults){
+                if (item.type && item[k]==undefined){
+                    item[k] = defaults[k]
+                }
             }
 
             this._schemaMap[path] = item
