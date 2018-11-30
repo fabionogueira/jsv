@@ -15,7 +15,7 @@ class Schema {
             }
 
             item.type = typeToString(item.type)
-            if (item.type && defaults.required){
+            if (item.type && item.required==undefined && defaults.required){
                 item.required = true
             }
 
