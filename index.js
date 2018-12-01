@@ -109,7 +109,7 @@ module.exports = class Schema {
             analized[defPath] = true
 
             if (def.required){
-                if (value===undefined){
+                if (value===undefined && !(def.type=='object' && !def.properties)){
                     error = {
                         path: valuePath,
                         message: `attribute required [${valuePath.substr(valuePath.lastIndexOf('/')+1)}]`
@@ -125,12 +125,14 @@ module.exports = class Schema {
                     def = self._schemaMap[`${defPath}/$items`]
                     
                     if (def.type == 'object'){
-                        requeridValidations(`${defPath}/$items`, `${defPath}/0`)
-                        if (error) return
-
-                        for (j in def.properties){
-                            requeridValidations(`${defPath}/$items/${j}`, `${defPath}/${i}/${j}`)
+                        if (def.properties){
+                            requeridValidations(`${defPath}/$items`, `${defPath}/0`)
                             if (error) return
+    
+                            for (j in def.properties){
+                                requeridValidations(`${defPath}/$items/${j}`, `${defPath}/${i}/${j}`)
+                                if (error) return
+                            }
                         }
 
                     } else if (def.type == 'array'){
@@ -214,7 +216,7 @@ module.exports = class Schema {
                 }
             }
 
-            if (typeof value == 'object'){
+            if (typeof value == 'object' && def.properties){
                 return baseValidations(value, path1, path2)
             }
         }
