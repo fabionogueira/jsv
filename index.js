@@ -1,7 +1,7 @@
 const CustomValidator = require('./custom-validator')
 const DataValidator = require('./data.validator')
 
-class Schema {
+module.exports = class Schema {
     constructor(schema, defaults = {}){
         this._schema = schema
         this._schemaMap = {}
@@ -9,12 +9,19 @@ class Schema {
         defaults = this._schema.$defaults || defaults || {}
         delete (this._schema.$defaults)
 
+        defaults.required = defaults.required == undefined ? true : defaults.required
+
         this.each((path, item) => {
             if (!item.type){
                 item = {type: item}
             }
 
+            if (!item.properties && !item.items){
+                item.$leaf = true
+            }
+
             item.type = typeToString(item.type)
+
             for (let k in defaults){
                 if (item.type && item[k]==undefined){
                     item[k] = defaults[k]
@@ -36,7 +43,7 @@ class Schema {
                 case Object: r = 'Object'; break
             }
 
-            return r.toLowerCase()
+            return r.toLowerCase ? r.toLowerCase() : 'object'
         }
     }
 
@@ -66,6 +73,23 @@ class Schema {
         return doFind(json, 1)
     }
     
+    /**
+     * 
+     * @param {String} name 
+     * @param {function(def, value, attribute, path, json, schema)} callback 
+     */
+    static customValidator(name, callback){
+        CustomValidator[name] == callback
+    }
+
+    getSchema(){
+        return this._schema
+    }
+
+    getMap(){
+        return this._schemaMap
+    }
+
     validate(json, successfn, errorfn){
         let value, def, error
         let self = this
@@ -240,26 +264,21 @@ class Schema {
     each(fn){
 
         Object.keys(this._schema).forEach(key => {
-            each(this._schema[key], `/${key}`)
+            each(this._schema[key], `/${key}`, key)
         })
 
-        function each(item, path){
-            fn(path, item)
+        function each(item, path, key){
+            fn(path, item, key)
     
             if (item.properties){
-                Object.keys(item.properties).forEach(key => {
-                    each(item.properties[key], `${path}/${key}`)
+                Object.keys(item.properties).forEach(k => {
+                    each(item.properties[k], `${path}/${k}`, k)
                 })
             }
     
             if (item.items && item.type.includes('array')){
-                each(item.items, `${path}/$items`)
+                each(item.items, `${path}/$items`, '$items')
             }
         }
     }
-}
-
-module.exports = {
-    Schema,
-    CustomValidator
 }

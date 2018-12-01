@@ -1,6 +1,6 @@
 {
     "name": "fn-schemavalidator",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Javascript JSON Schema Validator",
     "main": "index.js",
     "dependencies": {
